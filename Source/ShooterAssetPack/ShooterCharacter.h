@@ -26,4 +26,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputMappingContext* InputMapping;
+	
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputAction* LookAction;
+
 };
