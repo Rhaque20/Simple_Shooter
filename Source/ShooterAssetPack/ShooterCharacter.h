@@ -18,6 +18,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void Move(const struct FInputActionValue& InputValue);
+	void Look(const struct FInputActionValue& InputValue);
+	void Jump();
 
 public:	
 	// Called every frame
@@ -38,5 +41,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	class UInputAction* LookAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera Component")
+	class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera Component")
+	class USpringArmComponent* SpringArm;
 
 };

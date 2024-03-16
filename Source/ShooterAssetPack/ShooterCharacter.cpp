@@ -2,12 +2,27 @@
 
 
 #include "ShooterCharacter.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
+
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->bUsePawnControlRotation = true;
+
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
+	Camera->SetupAttachment(SpringArm);
 
 }
 
@@ -30,5 +45,65 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if(UEnhancedInputLocalPlayerSubsystem *Subsystem 
+		= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(InputMapping,0);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Player Controller failed to cast"));
+	}
+
+	if(UEnhancedInputComponent* Input = 
+	CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		Input->BindAction(MoveAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Move);
+		Input->BindAction(LookAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Look);
+		Input->BindAction(JumpAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Jump);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Input failed to cast"));
+	}
+
+}
+
+void AShooterCharacter::Move(const FInputActionValue& InputValue)
+{
+	FVector2D InputVector = InputValue.Get<FVector2D>();
+
+	if (IsValid(Controller))
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation = FRotator(0.f,Rotation.Yaw,0.f);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		AddMovementInput(ForwardDirection, InputVector.Y);
+		AddMovementInput(RightDirection, InputVector.X);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid Controller"));
+	}
+}
+
+void AShooterCharacter::Look(const FInputActionValue& InputValue)
+{
+	FVector2D InputVector = InputValue.Get<FVector2D>();
+	if (IsValid(Controller))
+	{
+		AddControllerYawInput(InputVector.X);
+		AddControllerPitchInput(InputVector.Y);
+	}
+}
+
+void AShooterCharacter::Jump()
+{
+	ACharacter::Jump();
 }
 
