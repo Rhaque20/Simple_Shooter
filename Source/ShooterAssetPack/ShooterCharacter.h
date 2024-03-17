@@ -20,6 +20,7 @@ protected:
 	virtual void BeginPlay() override;
 	void Move(const struct FInputActionValue& InputValue);
 	void Look(const struct FInputActionValue& InputValue);
+	void LookUpRate(const struct FInputActionValue& InputValue);
 	void Jump();
 
 public:	
@@ -42,10 +43,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputAction* LookUpRateAction;
+
 	UPROPERTY(VisibleAnywhere, Category = "Camera Component")
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera Component")
 	class USpringArmComponent* SpringArm;
 
+private:
+	UPROPERTY(EditAnywhere)
+	float RotationRate = 10.f;
 };

@@ -64,6 +64,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		Input->BindAction(MoveAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Move);
 		Input->BindAction(LookAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Look);
 		Input->BindAction(JumpAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Jump);
+		Input->BindAction(LookUpRateAction,ETriggerEvent::Triggered,this,&AShooterCharacter::LookUpRate);
 	}
 	else
 	{
@@ -99,6 +100,17 @@ void AShooterCharacter::Look(const FInputActionValue& InputValue)
 	{
 		AddControllerYawInput(InputVector.X);
 		AddControllerPitchInput(InputVector.Y);
+	}
+}
+
+void AShooterCharacter::LookUpRate(const FInputActionValue& InputValue)
+{
+	FVector2D InputVector = InputValue.Get<FVector2D>();
+	if (IsValid(Controller))
+	{
+		float RotationMod = RotationRate * GetWorld()->GetDeltaSeconds();
+		AddControllerYawInput(InputVector.X * RotationMod);
+		AddControllerPitchInput(InputVector.Y * RotationMod);
 	}
 }
 
