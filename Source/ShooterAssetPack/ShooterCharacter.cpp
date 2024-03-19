@@ -32,9 +32,17 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
-	GetMesh()->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
-	Gun->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("weapon_socket"));
-	Gun->SetOwner(this);
+	if (Gun)
+	{
+		GetMesh()->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
+		Gun->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("weapon_socket"));
+		Gun->SetOwner(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Gun is null"));
+	}
+	
 	
 }
 
@@ -70,6 +78,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		Input->BindAction(LookAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Look);
 		Input->BindAction(JumpAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Jump);
 		Input->BindAction(LookUpRateAction,ETriggerEvent::Triggered,this,&AShooterCharacter::LookUpRate);
+		Input->BindAction(FireAction,ETriggerEvent::Triggered,this,&AShooterCharacter::Fire);
 	}
 	else
 	{
@@ -122,5 +131,11 @@ void AShooterCharacter::LookUpRate(const FInputActionValue& InputValue)
 void AShooterCharacter::Jump()
 {
 	ACharacter::Jump();
+}
+
+void AShooterCharacter::Fire()
+{
+	if (Gun)
+		Gun->PullTrigger();
 }
 

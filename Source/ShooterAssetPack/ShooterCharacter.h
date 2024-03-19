@@ -23,6 +23,7 @@ protected:
 	void Look(const struct FInputActionValue& InputValue);
 	void LookUpRate(const struct FInputActionValue& InputValue);
 	void Jump();
+	void Fire();
 
 public:	
 	// Called every frame
@@ -46,6 +47,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	class UInputAction* LookUpRateAction;
+
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
+	class UInputAction* FireAction;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera Component")
 	class UCameraComponent* Camera;
